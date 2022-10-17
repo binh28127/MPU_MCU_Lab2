@@ -102,6 +102,32 @@ void display7SEG(int num) {
 			break;
 	}
 }
+
+const int MAX_LED = 4;
+int index_led = 0;
+int led_buffer[4] = {1, 2, 3, 4};
+void update7SEG(int index){
+    switch (index){
+        case 0:
+            //Display the first 7SEG with led_buffer[0]
+            display7SEG(led_buffer[0]);
+            break;
+        case 1:
+            //Display the second 7SEG with led_buffer[1]
+            display7SEG(led_buffer[1]);
+            break;
+        case 2:
+            //Display the third 7SEG with led_buffer[2]
+            display7SEG(led_buffer[2]);
+            break;
+        case 3:
+            //Display the forth 7SEG with led_buffer[3]
+            display7SEG(led_buffer[3]);
+            break;
+        default:
+            break;
+    }
+}
 /* USER CODE END 0 */
 
 /**
@@ -273,8 +299,8 @@ static void MX_GPIO_Init(void)
 int counter = 200;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	if (counter <= 0) {
-		counter = 200;
+	if (index_led >= MAX_LED) {
+		index_led = 0;
 	}
 
 	// Blink the two LEDs every second
@@ -283,31 +309,35 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
 	}
 
-	// Display number 1 on the 1st 7seg
-	if (counter >= 150) {
+	// Display the 1st 7seg
+	if (counter == 200) {
 		HAL_GPIO_WritePin(GPIOA, 0x0040, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(GPIOA, 0x0380, GPIO_PIN_SET);
-		display7SEG(1);
+		update7SEG(index_led++);
 	}
-	// Display number 2 on the 2nd 7seg
-	else if (counter >= 100){
+	// Display the 2nd 7seg
+	else if (counter == 150){
 		HAL_GPIO_WritePin(GPIOA, 0x0080, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(GPIOA, 0x0340, GPIO_PIN_SET);
-		display7SEG(2);
+		update7SEG(index_led++);
 	}
-	// Display number 3 on the 3rd 7seg
-	else if (counter >= 50){
+	// Display the 3rd 7seg
+	else if (counter == 100){
 		HAL_GPIO_WritePin(GPIOA, 0x0100, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(GPIOA, 0x02C0, GPIO_PIN_SET);
-		display7SEG(3);
+		update7SEG(index_led++);
 	}
-	// Display number 0 on the 4th 7seg
-	else {
+	// Display the 4th 7seg
+	else  if (counter == 50){
 		HAL_GPIO_WritePin(GPIOA, 0x0200, GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(GPIOA, 0x01C0, GPIO_PIN_SET);
-		display7SEG(0);
+		update7SEG(index_led++);
 	}
- 	counter--;
+
+	counter--;
+	if (counter <= 0) {
+		counter = 200;
+	}
 }
 /* USER CODE END 4 */
 
