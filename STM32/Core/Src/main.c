@@ -296,7 +296,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-int counter = 200;
+int counter = 100;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if (index_led >= MAX_LED) {
@@ -304,40 +304,38 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	}
 
 	// Blink the two LEDs every second
-	if (counter % 100 == 0) {
+	if (counter <= 0) {
+		counter = 100;
 		HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
 		HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
 	}
 
 	// Display the 1st 7seg
-	if (counter == 200) {
+	if (counter == 100) {
+		HAL_GPIO_WritePin(GPIOA, 0x03C0, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(GPIOA, 0x0040, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPIOA, 0x0380, GPIO_PIN_SET);
 		update7SEG(index_led++);
 	}
 	// Display the 2nd 7seg
-	else if (counter == 150){
+	else if (counter == 75){
+		HAL_GPIO_WritePin(GPIOA, 0x03C0, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(GPIOA, 0x0080, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPIOA, 0x0340, GPIO_PIN_SET);
 		update7SEG(index_led++);
 	}
 	// Display the 3rd 7seg
-	else if (counter == 100){
+	else if (counter == 50){
+		HAL_GPIO_WritePin(GPIOA, 0x03C0, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(GPIOA, 0x0100, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPIOA, 0x02C0, GPIO_PIN_SET);
 		update7SEG(index_led++);
 	}
 	// Display the 4th 7seg
-	else  if (counter == 50){
+	else  if (counter == 25){
+		HAL_GPIO_WritePin(GPIOA, 0x03C0, GPIO_PIN_SET);
 		HAL_GPIO_WritePin(GPIOA, 0x0200, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(GPIOA, 0x01C0, GPIO_PIN_SET);
 		update7SEG(index_led++);
 	}
 
 	counter--;
-	if (counter <= 0) {
-		counter = 200;
-	}
 }
 /* USER CODE END 4 */
 
