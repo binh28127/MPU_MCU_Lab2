@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "software_timer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -173,22 +173,14 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-	    second++;
-	    if (second >= 60){
-	        second = 0;
-	        minute++;
-	    }
-	    if(minute >= 60){
-	        minute = 0;
-	        hour++;
-	    }
-	    if(hour >= 24){
-	        hour = 0;
-	    }
-	    updateClockBuffer();
-	    HAL_Delay(1000);
+  setTimer0(1000);
+
+  while (1){
+
+      if(timer0_flag == 1){
+          HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+          setTimer0(2000);
+      }
 
     /* USER CODE END WHILE */
 
@@ -322,6 +314,8 @@ static void MX_GPIO_Init(void)
 int counter = 100;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+	timerRun0();
+
 	if (index_led >= MAX_LED) {
 		index_led = 0;
 	}
@@ -329,7 +323,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	// Blink the two LEDs every second
 	if (counter <= 0) {
 		counter = 100;
-		HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
 		HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
 	}
 
