@@ -139,48 +139,53 @@ void updateClockBuffer(void) {
 
 const int MAX_LED_MATRIX = 8;
 int index_led_matrix = 0;
-uint8_t matrix_buffer[8] = {0x00, 0xFC, 0xFE, 0x33, 0x33, 0xFE, 0xFC, 0x00};
+int index_shift = 0;
+uint8_t matrix_buffer[24] = {
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0xFC, 0xFE, 0x33, 0x33, 0xFE, 0xFC, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
 void updateLEDMatrix(int index){
     switch (index){
         case 0:
         	// Set bits for ROW0
-        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[0] << 8, GPIO_PIN_RESET);
-        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[0]) << 8, GPIO_PIN_SET);
+        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[0 + index_shift] << 8, GPIO_PIN_RESET);
+        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[0 + index_shift]) << 8, GPIO_PIN_SET);
             break;
         case 1:
         	// Set bits for ROW1
-        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[1] << 8, GPIO_PIN_RESET);
-        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[1]) << 8, GPIO_PIN_SET);
+        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[1 + index_shift] << 8, GPIO_PIN_RESET);
+        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[1 + index_shift]) << 8, GPIO_PIN_SET);
             break;
         case 2:
         	// Set bits for ROW2
-        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[2] << 8, GPIO_PIN_RESET);
-        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[2]) << 8, GPIO_PIN_SET);
+        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[2 + index_shift] << 8, GPIO_PIN_RESET);
+        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[2 + index_shift]) << 8, GPIO_PIN_SET);
             break;
         case 3:
         	// Set bits for ROW3
-        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[3] << 8, GPIO_PIN_RESET);
-        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[3]) << 8, GPIO_PIN_SET);
+        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[3 + index_shift] << 8, GPIO_PIN_RESET);
+        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[3 + index_shift]) << 8, GPIO_PIN_SET);
             break;
         case 4:
         	// Set bits for ROW4
-        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[4] << 8, GPIO_PIN_RESET);
-        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[4]) << 8, GPIO_PIN_SET);
+        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[4 + index_shift] << 8, GPIO_PIN_RESET);
+        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[4 + index_shift]) << 8, GPIO_PIN_SET);
             break;
         case 5:
         	// Set bits for ROW5
-        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[5] << 8, GPIO_PIN_RESET);
-        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[5]) << 8, GPIO_PIN_SET);
+        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[5 + index_shift] << 8, GPIO_PIN_RESET);
+        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[5 + index_shift]) << 8, GPIO_PIN_SET);
             break;
         case 6:
         	// Set bits for ROW6
-        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[6] << 8, GPIO_PIN_RESET);
-        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[6]) << 8, GPIO_PIN_SET);
+        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[6 + index_shift] << 8, GPIO_PIN_RESET);
+        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[6 + index_shift]) << 8, GPIO_PIN_SET);
             break;
         case 7:
         	// Set bits for ROW7
-        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[7] << 8, GPIO_PIN_RESET);
-        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[7]) << 8, GPIO_PIN_SET);
+        	HAL_GPIO_WritePin(GPIOB, matrix_buffer[7 + index_shift] << 8, GPIO_PIN_RESET);
+        	HAL_GPIO_WritePin(GPIOB, (~matrix_buffer[7 + index_shift]) << 8, GPIO_PIN_SET);
             break;
         default:
             break;
@@ -287,7 +292,12 @@ int main(void)
 			setTimer1(SEG_switching_time);
 		}
 
-		if (index_led_matrix >= MAX_LED_MATRIX) index_led_matrix = 0;
+		if (index_led_matrix >= MAX_LED_MATRIX) {
+			index_led_matrix = 0;
+			index_shift++;
+		}
+
+		if (index_shift >= 16) index_shift = 0;
 
 		if (timer2_flag == 1) {
 			// Clear all
