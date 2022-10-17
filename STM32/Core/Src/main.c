@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "software_timer.h"
+#include "global.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -173,14 +174,33 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  setTimer0(1000);
+  setTimer0(LED_time);
+  setTimer1(SEG_switching_time);
 
-  while (1){
+  while (1)
+  {
+	  // Blink LED every second
+	  if (timer0_flag == 1) {
+		  HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+		  HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
 
-      if(timer0_flag == 1){
-          HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
-          setTimer0(2000);
-      }
+		  setTimer0(LED_time);
+		  second++;
+	  }
+
+	  // Update clock buffer
+		if (second >= 60){
+			second = 0;
+			minute++;
+		}
+		if (minute >= 60){
+			minute = 0;
+			hour++;
+		}
+		if (hour >= 24){
+			hour = 0;
+		}
+		updateClockBuffer();
 
     /* USER CODE END WHILE */
 
@@ -312,47 +332,44 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 int counter = 100;
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	timerRun0();
+	timerRun1();
 
-	if (index_led >= MAX_LED) {
-		index_led = 0;
-	}
+	if (index_led >= MAX_LED) index_led = 0;
 
-	// Blink the two LEDs every second
-	if (counter <= 0) {
-		counter = 100;
-		HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
-	}
+	if (timer1_flag == 1) {
+		// Clear all
+		HAL_GPIO_WritePin(GPIOA, 0x03C0, GPIO_PIN_SET);
 
-	// Display the 1st 7seg
-	if (counter == 100) {
-		HAL_GPIO_WritePin(GPIOA, 0x03C0, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOA, 0x0040, GPIO_PIN_RESET);
-		update7SEG(index_led++);
-	}
-	// Display the 2nd 7seg
-	else if (counter == 75){
-		HAL_GPIO_WritePin(GPIOA, 0x03C0, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOA, 0x0080, GPIO_PIN_RESET);
-		update7SEG(index_led++);
-	}
-	// Display the 3rd 7seg
-	else if (counter == 50){
-		HAL_GPIO_WritePin(GPIOA, 0x03C0, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOA, 0x0100, GPIO_PIN_RESET);
-		update7SEG(index_led++);
-	}
-	// Display the 4th 7seg
-	else  if (counter == 25){
-		HAL_GPIO_WritePin(GPIOA, 0x03C0, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(GPIOA, 0x0200, GPIO_PIN_RESET);
-		update7SEG(index_led++);
-	}
+		switch (index_led) {
+			case 0:
+				// Choose 1st 7seg to display
+				HAL_GPIO_WritePin(EN0_GPIO_Port, EN0_Pin, GPIO_PIN_RESET);
+				break;
+			case 1:
+				// Choose 2nd 7seg to display
+				HAL_GPIO_WritePin(EN1_GPIO_Port, EN1_Pin, GPIO_PIN_RESET);
+				break;
+			case 2:
+				// Choose 3rd 7seg to display
+				HAL_GPIO_WritePin(EN2_GPIO_Port, EN2_Pin, GPIO_PIN_RESET);
+				break;
+			case 3:
+				// Choose 4th 7seg to display
+				HAL_GPIO_WritePin(EN3_GPIO_Port, EN3_Pin, GPIO_PIN_RESET);
+				break;
+			default:
+				break;
+		}
 
-	counter--;
-}
+		// Display the 7seg
+		update7SEG(index_led++);
+
+		// Set timer to switch
+		setTimer1(SEG_switching_time);
+	}
+ }
 /* USER CODE END 4 */
 
 /**
