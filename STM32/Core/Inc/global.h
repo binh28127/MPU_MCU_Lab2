@@ -12,5 +12,6 @@
 
 extern int LED_time;
 extern int SEG_switching_time;
+extern int matrix_scanning_time;
 
 #endif /* INC_GLOBAL_H_ */

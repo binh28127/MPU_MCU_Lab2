@@ -9,3 +9,4 @@
 
 int LED_time = 1000;
 int SEG_switching_time = 250;
+int matrix_scanning_time = 10;
